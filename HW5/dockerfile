@@ -1,0 +1,8 @@
+# Використовуємо офіційний образ Nginx
+FROM nginx:latest
+
+# Копіюємо наш HTML-файл в стандартну веб-директорію Nginx
+COPY index.html /usr/share/nginx/html/index.html
+
+# Відкриваємо порт 80 для доступу до Nginx
+EXPOSE 80
