@@ -1,0 +1,12 @@
+---
+- name: Execute command and display output
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: List /etc directory
+      command: ls /etc
+      register: ls_output
+
+    - name: Display output
+      debug:
+        var: ls_output.stdout

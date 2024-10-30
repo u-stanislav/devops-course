@@ -1,0 +1,14 @@
+[devops4_1]
+vm1 ansible_host=98.64.145.254 ansible_ssh_private_key_file=./http.devops.4_key.pem ansible_port=2201
+
+[devops4_2]
+vm2 ansible_host=98.64.145.254 ansible_ssh_private_key_file=./http.devops.4.2_key_1018.pem ansible_port=2202
+
+[azurevms:children]
+devops4_1
+devops4_2
+
+[azurevms:vars]
+ansible_user=azureuser
+
+
