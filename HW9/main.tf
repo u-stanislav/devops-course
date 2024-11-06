@@ -12,18 +12,12 @@ resource "azurerm_virtual_network" "devops-hw9" {
   address_space       = ["10.0.0.0/16"]
 }
 
-resource "azurerm_subnet" "subnet1" {
-  name                 = "subnet1"
+resource "azurerm_subnet" "subnet" {
+  count = 2
+  name                 = "subnet${count.index}"
   resource_group_name  = azurerm_resource_group.devops-hw9.name
   virtual_network_name = azurerm_virtual_network.devops-hw9.name
-  address_prefixes     = ["10.0.1.0/24"]
-}
-
-resource "azurerm_subnet" "subnet2" {
-  name                 = "subnet2"
-  resource_group_name  = azurerm_resource_group.devops-hw9.name
-  virtual_network_name = azurerm_virtual_network.devops-hw9.name
-  address_prefixes     = ["10.0.2.0/24"]
+  address_prefixes     = ["10.0.${count.index + 1}.0/24"]
 }
 
 
@@ -62,16 +56,11 @@ resource "azurerm_network_security_rule" "allow_http" {
   network_security_group_name = azurerm_network_security_group.devops-hw9.name
 }
 
-resource "azurerm_subnet_network_security_group_association" "subnet1_nsg" {
-  subnet_id                 = azurerm_subnet.subnet1.id
+resource "azurerm_subnet_network_security_group_association" "subnet_nsg" {
+  count = 2
+  subnet_id                 = azurerm_subnet.subnet[count.index].id
   network_security_group_id = azurerm_network_security_group.devops-hw9.id
-  depends_on = [ azurerm_network_security_group.devops-hw9, azurerm_subnet.subnet1 ]
-}
-
-resource "azurerm_subnet_network_security_group_association" "subnet2_nsg" {
-  subnet_id                 = azurerm_subnet.subnet2.id
-  network_security_group_id = azurerm_network_security_group.devops-hw9.id
-  depends_on = [ azurerm_network_security_group.devops-hw9, azurerm_subnet.subnet2 ]
+  depends_on = [ azurerm_network_security_group.devops-hw9, azurerm_subnet.subnet ]
 }
 
 # creating public ip
@@ -92,7 +81,7 @@ resource "azurerm_network_interface" "nic" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.subnet1.id
+    subnet_id                     = azurerm_subnet.subnet[count.index].id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.pip[count.index].id
   }

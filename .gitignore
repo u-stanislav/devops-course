@@ -18,3 +18,4 @@ HW9/.terraform/modules/modules.json
 HW9/.terraform/providers/registry.terraform.io/hashicorp/azurerm/4.8.0/windows_amd64/LICENSE.txt
 HW9/.terraform/providers/registry.terraform.io/hashicorp/azurerm/4.8.0/windows_amd64/terraform-provider-azurerm_v4.8.0_x5.exe
 HW9/.terraform/providers/registry.terraform.io/hashicorp/tls/4.0.6/windows_amd64/LICENSE.txt
+HW9/.terraform.lock.hcl
