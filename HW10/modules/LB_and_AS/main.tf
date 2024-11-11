@@ -1,5 +1,5 @@
 # Availability Set
-resource "azurerm_availability_set" "example" {
+resource "azurerm_availability_set" "hw10" {
   name                = var.availability_set_name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -10,7 +10,7 @@ resource "azurerm_availability_set" "example" {
 }
 
 # Load Balancer
-resource "azurerm_lb" "example" {
+resource "azurerm_lb" "hw10" {
   name                = var.load_balancer_name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -24,14 +24,14 @@ resource "azurerm_lb" "example" {
 }
 
 # Backend Pool
-resource "azurerm_lb_backend_address_pool" "example" {
-  loadbalancer_id = azurerm_lb.example.id
+resource "azurerm_lb_backend_address_pool" "hw10" {
+  loadbalancer_id = azurerm_lb.hw10.id
   name            = "BackendPool"
 }
 
 # Health Probe
-resource "azurerm_lb_probe" "example" {
-  loadbalancer_id = azurerm_lb.example.id
+resource "azurerm_lb_probe" "hw10" {
+  loadbalancer_id = azurerm_lb.hw10.id
   name            = "HealthProbe"
   protocol        = "Tcp"
   port            = 80
@@ -40,12 +40,12 @@ resource "azurerm_lb_probe" "example" {
 }
 
 # Load Balancer Rule
-resource "azurerm_lb_rule" "example" {
-  loadbalancer_id            = azurerm_lb.example.id
+resource "azurerm_lb_rule" "hw10" {
+  loadbalancer_id            = azurerm_lb.hw10.id
   name                       = "HTTP"
   protocol                   = "Tcp"
   frontend_port              = 80
   backend_port               = 80
-  frontend_ip_configuration_name = azurerm_lb.example.frontend_ip_configuration[0]
-  probe_id                   = azurerm_lb_probe.example.id
+  frontend_ip_configuration_name = azurerm_lb.hw10.frontend_ip_configuration[0].name
+  probe_id                   = azurerm_lb_probe.hw10.id
 }

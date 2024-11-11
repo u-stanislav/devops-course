@@ -22,7 +22,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
+    offer     = "0001-com-ubuntu-server-jammy"
     sku       = "22_04-lts"
     version   = "latest"
   }
@@ -36,7 +36,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
               systemctl start nginx
               EOF
             )
-  
+  depends_on = [ azurerm_network_interface.nic ]
 }
 
 # Network Interface
@@ -50,12 +50,15 @@ resource "azurerm_network_interface" "nic" {
     name                          = "internal"
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
+    
   }
+
 }
 
-resource "azurerm_network_interface_application_gateway_backend_address_pool_association" "association" {
-  count               = var.vm_count    
-  network_interface_id    = azurerm_network_interface.nic.id
-  ip_configuration_name   = "${var.vm_name_prefix}-association${count.index}"
-  backend_address_pool_id = [var.lb_backend_pool_id]
+resource "azurerm_network_interface_backend_address_pool_association" "association" {
+  count =  var.vm_count
+  network_interface_id    = azurerm_network_interface.nic[count.index].id
+  ip_configuration_name   = "internal"
+  backend_address_pool_id = var.lb_backend_pool_id
+  depends_on = [ azurerm_network_interface.nic ]
 }

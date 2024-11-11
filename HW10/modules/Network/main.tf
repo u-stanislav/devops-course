@@ -17,12 +17,12 @@ resource "azurerm_subnet" "subnet" {
 # create security group
 resource "azurerm_network_security_group" "devops-hw10" {
   name                = "devops-hw10-nsg"
-  location            = azurerm_resource_group.devops-hw10.location
-  resource_group_name = azurerm_resource_group.devops-hw10.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_network_security_rule" "allow_ssh" {
-  resource_group_name  = azurerm_resource_group.devops-hw10.name
+  resource_group_name  = var.resource_group_name
   name                        = "allow_ssh"
   priority                    = 100
   direction                   = "Inbound"
@@ -36,7 +36,7 @@ resource "azurerm_network_security_rule" "allow_ssh" {
 }
 
 resource "azurerm_network_security_rule" "allow_http" {
-  resource_group_name  = azurerm_resource_group.devops-hw10.name
+  resource_group_name  = var.resource_group_name
   name                        = "allow_http"
   priority                    = 200
   direction                   = "Inbound"
@@ -44,7 +44,7 @@ resource "azurerm_network_security_rule" "allow_http" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "80"
-  source_address_prefixes     = "*"
+  source_address_prefixes     = var.allowed_ips
   destination_address_prefix  = "*"
   network_security_group_name = azurerm_network_security_group.devops-hw10.name
 }
@@ -58,16 +58,16 @@ resource "azurerm_subnet_network_security_group_association" "subnet_nsg" {
 # creating public ip
 resource "azurerm_public_ip" "pip" {
   name                = "terrafrom-${var.env_name}-pip"
-  location            = azurerm_resource_group.devops-hw10.location
-  resource_group_name = azurerm_resource_group.devops-hw10.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
   allocation_method   = "Static"
 }
 
 # create network interface
 resource "azurerm_network_interface" "nic" {
   name                = "terrafrom-${var.env_name}-nic"
-  location            = azurerm_resource_group.devops-hw10.location
-  resource_group_name = azurerm_resource_group.devops-hw10.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
 
   ip_configuration {
     name                          = "internal"

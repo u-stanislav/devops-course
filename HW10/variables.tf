@@ -5,7 +5,7 @@ variable "resource_group_name" {
 
 variable "location" {
   type    = string
-  default = "France Central-Paris"
+  default = "francecentral"
 }
 
 variable "allowed_ips" {
@@ -26,4 +26,9 @@ variable "project_name" {
 
 variable "public_key_path" {
   default = "../HW9/presets/id_rsa_0.pub"
+}
+
+variable "subscription_id" {
+  type = string
+  default = "00963533-2602-4db1-9d9e-748b36f03a13"
 }

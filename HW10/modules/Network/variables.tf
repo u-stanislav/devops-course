@@ -26,7 +26,7 @@ variable "nsg_name" {
 variable "location" {
   description = "The location/region where resources will be deployed"
   type        = string
-  default = "France Central-Paris"
+  default = "francecentral"
 }
 
 variable "resource_group_name" {
