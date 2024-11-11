@@ -62,19 +62,3 @@ resource "azurerm_public_ip" "pip" {
   resource_group_name = var.resource_group_name
   allocation_method   = "Static"
 }
-
-# create network interface
-resource "azurerm_network_interface" "nic" {
-  name                = "terrafrom-${var.env_name}-nic"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.subnet.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.pip.id
-  }
-
-  depends_on = [ azurerm_public_ip.pip ]
-}

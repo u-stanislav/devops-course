@@ -23,3 +23,8 @@ variable "subnet_id" {
   description = "The ID of the subnet for the load balancer frontend"
   type        = string
 }
+
+variable "public_ip" {
+  description = "The ID of the public_ip for the load balancer frontend"
+  type        = string
+}

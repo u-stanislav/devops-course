@@ -17,9 +17,8 @@ resource "azurerm_lb" "hw10" {
   sku                 = "Standard"
 
   frontend_ip_configuration {
-    name                 = "LoadBalancerFrontEnd"
-    subnet_id            = var.subnet_id
-    private_ip_address_allocation = "Dynamic"
+    name                 = "PublicIPAddress"
+    public_ip_address_id = var.public_ip
   }
 }
 
@@ -40,12 +39,24 @@ resource "azurerm_lb_probe" "hw10" {
 }
 
 # Load Balancer Rule
-resource "azurerm_lb_rule" "hw10" {
-  loadbalancer_id            = azurerm_lb.hw10.id
-  name                       = "HTTP"
-  protocol                   = "Tcp"
-  frontend_port              = 80
-  backend_port               = 80
+# resource "azurerm_lb_rule" "hw10" {
+#   loadbalancer_id            = azurerm_lb.hw10.id
+#   name                       = "HTTP"
+#   protocol                   = "Tcp"
+#   frontend_port              = 80
+#   backend_port               = 80
+#   frontend_ip_configuration_name = azurerm_lb.hw10.frontend_ip_configuration[0].name
+#   probe_id                   = azurerm_lb_probe.hw10.id
+# }
+
+# Load Balancer Rule (using backend_address_pool_ids)
+resource "azurerm_lb_rule" "example_lb_rule" {
+  loadbalancer_id                = azurerm_lb.hw10.id
+  name                           = "http-rule"
+  protocol                       = "Tcp"
+  frontend_port                  = 80
+  backend_port                   = 80
   frontend_ip_configuration_name = azurerm_lb.hw10.frontend_ip_configuration[0].name
-  probe_id                   = azurerm_lb_probe.hw10.id
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.hw10.id]
+  probe_id                       = azurerm_lb_probe.hw10.id
 }

@@ -29,13 +29,14 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   custom_data = base64encode(<<-EOF
               #!/bin/bash
-              apt-get update
-              apt-get install -y nginx
-              echo "<h1>Hostname: $(hostname)</h1> for devops course hw10" > /var/www/html/index.html
-              systemctl enable nginx
-              systemctl start nginx
+              sudo apt-get update
+              sudo apt-get install -y nginx
+              sudo echo "<h1>Hostname: $(hostname)</h1> for devops course hw10" > /var/www/html/index.html
+              sudo systemctl enable nginx
+              sudo systemctl start nginx
               EOF
             )
+
   depends_on = [ azurerm_network_interface.nic ]
 }
 
@@ -52,13 +53,19 @@ resource "azurerm_network_interface" "nic" {
     private_ip_address_allocation = "Dynamic"
     
   }
-
 }
 
-resource "azurerm_network_interface_backend_address_pool_association" "association" {
+resource "azurerm_network_interface_backend_address_pool_association" "association-bp" {
   count =  var.vm_count
   network_interface_id    = azurerm_network_interface.nic[count.index].id
   ip_configuration_name   = "internal"
   backend_address_pool_id = var.lb_backend_pool_id
+  depends_on = [ azurerm_network_interface.nic ]
+}
+
+resource "azurerm_network_interface_security_group_association" "association-sg" {
+  count =  var.vm_count
+  network_interface_id    = azurerm_network_interface.nic[count.index].id
+  network_security_group_id = var.nsg_id
   depends_on = [ azurerm_network_interface.nic ]
 }

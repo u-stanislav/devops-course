@@ -26,6 +26,9 @@ module "load_balancer_availability_set" {
   location              = var.location
   resource_group_name   = azurerm_resource_group.devops-hw10.name
   subnet_id             = module.network.subnet_id
+  public_ip = module.network.public_ip_address_id
+  
+  depends_on = [ module.network ]
 }
 
 # Virtual Machine Module
@@ -45,4 +48,7 @@ module "virtual_machines" {
   vm_size              = "Standard_B1s"
   admin_username       = "azureuser"
   ssh_public_key       = local.ssh_public_key
+  nsg_id               = module.network.nsg_id
+  
+  depends_on = [ module.load_balancer_availability_set ]
 }

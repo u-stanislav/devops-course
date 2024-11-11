@@ -29,6 +29,11 @@ variable "subnet_id" {
   type        = string
 }
 
+variable "nsg_id" {
+  description = "ID of the network securitu group for the VMs"
+  type        = string
+}
+
 variable "lb_backend_pool_id" {
   description = "ID of the load balancer backend pool"
   type        = string
