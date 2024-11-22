@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+    environment {
+        TF_WORKSPACE = 'jenkins' // Replace with your Terraform workspace if necessary
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                // Clone the GitHub repository
+                git branch: 'main', url: 'https://github.com/u-stanislav/devops-course/'
+            }
+        }
+        stage('Setup ssh keys and bucket') {
+            steps {
+                // Change directory to the Terraform subfolder
+                dir('HW9/presets') {
+                    script {
+                        // Initialize Terraform
+                        sh 'terraform init'
+                        // Apply Terraform configuration
+                        sh 'terraform apply -auto-approve'
+                    }
+                }
+            }
+        }
+        stage('Destroy environment') {
+            steps {
+                // Change directory to the Terraform subfolder
+                dir('HW9') {
+                    script {
+                        // Initialize Terraform
+                        sh 'terraform init'
+                        // Apply Terraform configuration
+                        sh 'terraform destroy -auto-approve'
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo "Pipeline completed"
+        }
+        failure {
+            echo "Pipeline failed"
+        }
+    }
+}

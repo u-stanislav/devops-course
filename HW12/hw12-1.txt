@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+    environment {
+        TF_WORKSPACE = 'jenkins' // Replace with your Terraform workspace if necessary
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                // Clone the GitHub repository
+                git branch: 'main', url: 'https://github.com/u-stanislav/devops-course/'
+            }
+        }
+        stage('Setup ssh keys and bucket') {
+            steps {
+                // Change directory to the Terraform subfolder
+                dir('HW9/presets') {
+                    script {
+                        // Initialize Terraform
+                        sh 'terraform init'
+                        // Apply Terraform configuration
+                        sh 'terraform apply -auto-approve'
+                    }
+                }
+            }
+        }
+        stage('Deploy environment') {
+            steps {
+                // Change directory to the Terraform subfolder
+                dir('HW9') {
+                    script {
+                        // Initialize Terraform
+                        sh 'terraform init'
+                        // Apply Terraform configuration
+                        sh 'terraform apply -auto-approve'
+                    }
+                }
+            }
+        }
+        stage('Generate Inventory') {
+            steps {
+                dir('HW9') {
+                    script {
+                        // Generate inventory.ini using the provided shell script
+                        sh '''
+                        public_ips=$(terraform output -json public_ip_addresses | jq -r '.[]')
+                        rm -f ./inventory.ini
+                        echo "$PWD"
+                        ssh_key1="$PWD/presets/id_rsa_0"
+                        ssh_key2="$PWD/presets/id_rsa_1"
+                        port1=22
+                        port2=22
+
+                        cat <<EOL > inventory.ini
+                        [devops4_1]
+                        vm1 ansible_host=$(echo "$public_ips" | sed -n '1p') ansible_ssh_private_key_file=$ssh_key1 ansible_port=$port1
+
+                        [devops4_2]
+                        vm2 ansible_host=$(echo "$public_ips" | sed -n '2p') ansible_ssh_private_key_file=$ssh_key2 ansible_port=$port2
+
+                        [azurevms:children]
+                        devops4_1
+                        devops4_2
+
+                        [azurevms:vars]
+                        ansible_user=azureuser
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Ansible playbook') {
+            steps {
+                // Change directory to the Terraform subfolder
+                dir('HW9') {
+                    script {
+                        // Apply ansible
+                        sh 'ansible-playbook -i inventory.ini ../HW7/nginx.yaml'
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo "Pipeline completed"
+        }
+        failure {
+            echo "Pipeline failed"
+        }
+    }
+}
