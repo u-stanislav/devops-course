@@ -10,10 +10,12 @@
           register: apt_process
           failed_when: false
 
-        - name: Kill any apt or dpkg processes
+        - name: Kill any apt or dpkg processes if running
           shell: |
-            pkill -9 -f apt || true
-            pkill -9 -f dpkg || true
+            if pgrep -a apt || pgrep -a dpkg; then
+              pkill -9 -f apt || true
+              pkill -9 -f dpkg || true
+            fi
             sleep 5
           when: apt_process.stdout != ""
 
