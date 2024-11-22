@@ -18,6 +18,7 @@
             fi
             sleep 5
           when: apt_process.stdout != ""
+          ignore_errors: true
 
         - name: Wait for dpkg lock to be released (manual retry)
           shell: test ! -e /var/lib/dpkg/lock-frontend
