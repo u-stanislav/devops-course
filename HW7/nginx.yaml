@@ -17,13 +17,13 @@
             sleep 5
           when: apt_process.stdout != ""
 
-        - name: Wait for dpkg lock to be released (retries)
-          wait_for:
-            path: /var/lib/dpkg/lock-frontend
-            state: absent
-            timeout: 60  # Increased timeout to 60 seconds
-            delay: 10    # Delay between retries (in seconds)
-            retries: 5   # Retry up to 5 times
+        - name: Wait for dpkg lock to be released (manual retry)
+          shell: test ! -e /var/lib/dpkg/lock-frontend
+          register: lock_released
+          retries: 5         # Retry 5 times
+          delay: 10          # Wait 10 seconds between retries
+          until: lock_released.rc == 0   # Success when lock is absent (exit code 0)
+          ignore_errors: true
 
     - name: Update apt packages
       apt:
