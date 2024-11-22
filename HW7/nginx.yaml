@@ -8,15 +8,6 @@
         killall -9 apt apt-get || true
         sleep 5  # Allow the lock to release
 
-    - name: Update apt packages
-      apt:
-        update_cache: yes
-
-    - name: Install NGINX
-      apt:
-        name: nginx
-        state: present
-
     - name: Create index.html with VM details
       template:
         src: index.html.j2
