@@ -15,7 +15,7 @@
     - name: Create index.html file with custom content
       copy:
         dest: /var/www/html/index.html
-        content: "Ansible the best"
+        content: "Ansible the best for <h1>Hostname: $(hostname)</h1>"
         owner: www-data
         group: www-data
         mode: '0644'
