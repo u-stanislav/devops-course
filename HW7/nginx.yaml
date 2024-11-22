@@ -3,6 +3,11 @@
   hosts: azurevms
   become: true
   tasks:
+    - name: Kill conflicting apt processes
+      shell: |
+        killall -9 apt apt-get || true
+        sleep 5  # Allow the lock to release
+
     - name: Update apt packages
       apt:
         update_cache: yes
