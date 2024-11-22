@@ -3,10 +3,42 @@
   hosts: azurevms
   become: true
   tasks:
-    - name: Kill conflicting apt processes
-      shell: |
-        killall -9 apt apt-get || true
-        sleep 5  # Allow the lock to release
+    - name: Ensure apt-get lock is released
+      block:
+        - name: Check if another apt process is running
+          shell: pgrep -a apt || true
+          register: apt_process
+          failed_when: false
+
+        - name: Kill any apt or dpkg processes
+          shell: |
+            pkill -9 -f apt || true
+            pkill -9 -f dpkg || true
+            sleep 5
+          when: apt_process.stdout != ""
+
+        - name: Wait for dpkg lock to be released
+          wait_for:
+            path: /var/lib/dpkg/lock-frontend
+            state: absent
+            timeout: 30
+
+    - name: Update apt packages
+      apt:
+        update_cache: yes
+
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: present
+
+    - name: Ensure /var/www/html directory exists
+      file:
+        path: /var/www/html
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
 
     - name: Create index.html with VM details
       template:
@@ -21,4 +53,3 @@
         name: nginx
         state: started
         enabled: yes
-
